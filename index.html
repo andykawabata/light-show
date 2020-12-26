@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light Show</title>
+    <style>
+        body {
+            font-family: "Lucida Console";
+            font-size: 26px;
+            }
+        #clock{
+            color:blue;
+            height: 80px;
+        }
+    </style>
+    <script>
+        var myVar = setInterval(function() {
+            myTimer();
+            }, 1000);
+
+        function myTimer() {
+            var d = new Date();
+            document.getElementById("clock").innerHTML = d.toLocaleTimeString();
+        }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+<body>
+    <p id="clock"></p>
+    <form onSubmit="return handleSubmit()">
+        <label for="numPeople">How many people?</label>
+        <select id="numPeople">
+            <option value="2">2</option>
+        </select>
+        <br/>
+        <label for="person">Member Number</label>
+        <select id="person">
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select>
+        <br/>
+        <label for="time">Starting Time</label>
+        <input type="time" id="time">
+        <br/>
+        <input type="submit"/>
+    </form>
+    <script>
+        
+        function handleSubmit(){
+            
+            document.body.style.background = 'black';
+            document.getElementsByTagName('form')[0].style.display = 'none'
+            let numPeople= document.getElementById("numPeople").value;
+            let person = document.getElementById("person").value;
+            let startTime = document.getElementById("time").value;
+            let startTimeObject = getMillisTillStart(startTime); 
+            if(isNaN(startTimeObject.getTime())){
+                alert("Enter Full Time");
+                return;
+            }
+            waitForShow(startTimeObject, numPeople, person);
+            return false;
+        }
+
+
+        function waitForShow(_startTimeObject, _numPeople, _person){
+            let millisTillStart = _startTimeObject.getTime() - Date.now()
+            //millisTillStart = 1000;
+            console.log(millisTillStart)
+            setTimeout(function(){startShow(_numPeople, _person)}, millisTillStart);
+        }
+        function startShow(_numPeople, _person){
+            document.getElementById('clock').style.display = 'none';
+            let numPeople = parseInt(_numPeople);
+            let personNumber = parseInt(_person) - 1;
+            let totalInterval = 1000
+            let delay = (personNumber/numPeople) * totalInterval
+            let count = 0;
+
+            //full second blinks
+            let timer = setInterval(function(){
+                blink(delay);
+                if(count >= 4){
+                    clearInterval(timer);
+                    setTimeout(setTimer2(), totalInterval);
+                }
+                count++;
+            },totalInterval);
+
+            //half second blinks
+            function setTimer2(){
+                totalInterval = 500
+                delay = (personNumber/numPeople) * totalInterval;
+                count = 0;
+                let timer2 = setInterval(function(){
+                    blink(delay);
+                    if(count >= 4){
+                        clearInterval(timer2);
+                        setTimeout(setTimer3(), totalInterval);
+                    }
+                    count++;
+                },totalInterval)
+            }
+
+            //blink at same time
+            function setTimer3(){
+                totalInterval = 500
+                delay = 0
+                count = 0;
+                let timer3 = setInterval(function(){
+                    blink(delay);
+                    if(count >= 4){
+                        clearInterval(timer3);
+                        setTimeout(setTimer4(), totalInterval);
+                    }
+                    count++;
+                },totalInterval)
+
+            }
+
+            //two blinks slow
+            function setTimer4(){
+                totalInterval = 1000;
+                delay = (personNumber/numPeople) * totalInterval;
+                count = 0;
+                let timer4 = setInterval(function(){
+                    blinkTwice(delay, totalInterval);
+                    if(count >= 4){
+                        clearInterval(timer4);
+                        setTimeout(setTimer5(), totalInterval);
+                    }
+                    count++;
+                },totalInterval)
+            }
+
+            //two blinks fast
+            function setTimer5(){
+                totalInterval = 500;
+                delay = (personNumber/numPeople) * totalInterval;
+                count = 0;
+                let timer5 = setInterval(function(){
+                    blinkTwice(delay, totalInterval);
+                    if(count >= 4){
+                        clearInterval(timer5);
+                    }
+                    count++;
+                },totalInterval)
+            }
+            
+            function blink(_timeout){
+                setTimeout(function(){
+                    document.body.style.background = 'aqua';
+                    setTimeout(function(){document.body.style.background = 'black'}, 50);
+                }, _timeout);
+            }
+
+            function blinkTwice(_timeout, _totalInterval){
+                let myInterval= _totalInterval/numPeople
+                let firstBlink = _timeout;
+                let secondBlink = _timeout + myInterval/2
+                console.log(firstBlink);
+                console.log(secondBlink);
+                setTimeout(function(){
+                    document.body.style.background = 'aqua';
+                    setTimeout(function(){document.body.style.background = 'black'}, 50);
+                }, firstBlink);
+                setTimeout(function(){
+                    document.body.style.background = 'aqua';
+                    setTimeout(function(){document.body.style.background = 'black'}, 50);
+                }, secondBlink);
+            }
+        }
+        //start time in "HH:MM"
+        function getMillisTillStart(_startTime){
+        
+            let hours = _startTime.split(":")[0];
+            let min = _startTime.split(":")[1];
+            let startTimeObject = new Date();
+            startTimeObject.setHours(hours);
+            startTimeObject.setMinutes(min);
+            startTimeObject.setSeconds(0);
+            startTimeObject.setMilliseconds(0);
+            return startTimeObject;
+        }
+    </script>
+</body>
+</html>
